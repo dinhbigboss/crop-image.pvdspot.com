@@ -1,0 +1,863 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Image - High Performance Online Image Cropper</title>
+    <meta name="description"
+        content="Free, fast, and secure online image cropper. Crop, rotate, and edit images entirely in your browser. No server uploads.">
+    <meta name="robots" content="index, follow">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://crop-image.pvdspot.com/">
+    <meta property="og:title" content="Crop Image - High Performance Online Image Cropper">
+    <meta property="og:description"
+        content="Free, fast, and secure online image cropper. Crop, rotate, and edit images entirely in your browser.">
+    <meta property="og:image" content="https://crop-image.pvdspot.com/og-image.svg">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://crop-image.pvdspot.com/">
+    <meta property="twitter:title" content="Crop Image - High Performance Online Image Cropper">
+    <meta property="twitter:description"
+        content="Free, fast, and secure online image cropper. Crop, rotate, and edit images entirely in your browser.">
+    <meta property="twitter:image" content="https://crop-image.pvdspot.com/og-image.svg">
+
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="alternate icon" href="/favicon.ico">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f0f9ff',
+                            100: '#e0f2fe',
+                            500: '#0ea5e9',
+                            600: '#0284c7',
+                            700: '#0369a1',
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        body {
+            -webkit-tap-highlight-color: transparent;
+        }
+
+        .crop-overlay {
+            background: rgba(0, 0, 0, 0.6);
+        }
+
+        input[type=range] {
+            -webkit-appearance: none;
+            appearance: none;
+            background: transparent;
+        }
+
+        input[type=range]::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            height: 16px;
+            width: 16px;
+            border-radius: 50%;
+            background: #0ea5e9;
+            cursor: pointer;
+            margin-top: -6px;
+        }
+
+        input[type=range]::-webkit-slider-runnable-track {
+            width: 100%;
+            height: 4px;
+            cursor: pointer;
+            background: #e2e8f0;
+            border-radius: 2px;
+        }
+
+        .dark input[type=range]::-webkit-slider-runnable-track {
+            background: #475569;
+        }
+
+        .bg-grid-pattern {
+            background-color: transparent;
+            background-image: linear-gradient(#e5e7eb 1px, transparent 1px),
+                linear-gradient(90deg, #e5e7eb 1px, transparent 1px);
+            background-size: 20px 20px;
+        }
+
+        .dark .bg-grid-pattern {
+            background-image: linear-gradient(#374151 1px, transparent 1px),
+                linear-gradient(90deg, #374151 1px, transparent 1px);
+        }
+
+        details>summary svg.chevron {
+            transition: transform 0.3s ease-in-out;
+        }
+
+        details[open]>summary svg.chevron {
+            transform: rotate(180deg);
+        }
+
+        details>summary {
+            list-style: none;
+        }
+
+        details>summary::-webkit-details-marker {
+            display: none;
+        }
+    </style>
+</head>
+
+<body
+    class="bg-gray-50 text-gray-900 dark:bg-gray-900 dark:text-gray-100 transition-colors duration-200 min-h-screen flex flex-col font-sans">
+
+    <header
+        class="sticky top-0 z-50 w-full border-b border-gray-200 dark:border-gray-800 bg-white/80 dark:bg-gray-900/80 backdrop-blur-md">
+        <div class="container mx-auto px-4 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group">
+                <div
+                    class="w-8 h-8 rounded-lg bg-brand-500 text-white flex items-center justify-center font-bold text-xl group-hover:bg-brand-600 transition-colors">
+                    <svg xmlns="http://www.w3.org/2000/svg" class="h-5 w-5" viewBox="0 0 20 20" fill="currentColor">
+                        <path fill-rule="evenodd"
+                            d="M4 3a2 2 0 00-2 2v10a2 2 0 002 2h12a2 2 0 002-2V5a2 2 0 00-2-2H4zm12 12H4l4-8 3 6 2-4 3 6z"
+                            clip-rule="evenodd" />
+                    </svg>
+                </div>
+                <span class="font-bold text-lg tracking-tight">Crop Image</span>
+            </a>
+
+            <button id="theme-toggle"
+                class="p-2 rounded-full hover:bg-gray-100 dark:hover:bg-gray-800 transition-colors text-gray-500 dark:text-gray-400"
+                aria-label="Toggle Dark Mode">
+                <svg id="theme-toggle-light-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path
+                        d="M10 2a1 1 0 011 1v1a1 1 0 11-2 0V3a1 1 0 011-1zm4 8a4 4 0 11-8 0 4 4 0 018 0zm-.464 4.95l.707.707a1 1 0 001.414-1.414l-.707-.707a1 1 0 00-1.414 1.414zm2.12-10.607a1 1 0 010 1.414l-.706.707a1 1 0 11-1.414-1.414l.707-.707a1 1 0 011.414 0zM17 11a1 1 0 100-2h-1a1 1 0 100 2h1zm-7 4a1 1 0 011 1v1a1 1 0 11-2 0v-1a1 1 0 011-1zM5.05 6.464A1 1 0 106.465 5.05l-.708-.707a1 1 0 00-1.414 1.414l.707.707zm1.414 8.486l-.707.707a1 1 0 01-1.414-1.414l.707-.707a1 1 0 011.414 1.414zM4 11a1 1 0 100-2H3a1 1 0 100 2h1z"
+                        fill-rule="evenodd" clip-rule="evenodd"></path>
+                </svg>
+                <svg id="theme-toggle-dark-icon" class="hidden w-5 h-5" fill="currentColor" viewBox="0 0 20 20"
+                    xmlns="http://www.w3.org/2000/svg">
+                    <path d="M17.293 13.293A8 8 0 016.707 2.707a8.001 8.001 0 1010.586 10.586z"></path>
+                </svg>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow container mx-auto px-4 py-8">
+
+        <div
+            class="max-w-5xl mx-auto bg-white dark:bg-gray-800 rounded-2xl shadow-sm border border-gray-200 dark:border-gray-700 overflow-hidden min-h-[500px] flex flex-col md:flex-row">
+
+            <div
+                class="flex-grow relative bg-gray-50 dark:bg-gray-900/50 flex items-center justify-center p-4 min-h-[400px] bg-grid-pattern">
+
+                <div id="upload-area"
+                    class="text-center p-8 border-2 border-dashed border-gray-300 dark:border-gray-600 rounded-xl hover:border-brand-500 dark:hover:border-brand-500 transition-colors w-full h-full flex flex-col items-center justify-center cursor-pointer bg-white dark:bg-gray-800">
+                    <svg class="w-16 h-16 text-gray-400 mb-4" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                        xmlns="http://www.w3.org/2000/svg">
+                        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5"
+                            d="M4 16l4.586-4.586a2 2 0 012.828 0L16 16m-2-2l1.586-1.586a2 2 0 012.828 0L20 14m-6-6h.01M6 20h12a2 2 0 002-2V6a2 2 0 00-2-2H6a2 2 0 00-2 2v12a2 2 0 002 2z">
+                        </path>
+                    </svg>
+                    <h3 class="text-xl font-semibold mb-2">Drop your image here</h3>
+                    <p class="text-gray-500 text-sm mb-6">or click to browse files</p>
+                    <button
+                        class="px-6 py-2.5 bg-brand-500 hover:bg-brand-600 text-white font-medium rounded-lg transition-colors shadow-sm shadow-brand-500/30">
+                        Select Image
+                    </button>
+                    <input type="file" id="file-input" class="hidden" accept="image/png, image/jpeg, image/webp"
+                        aria-label="Upload image">
+                </div>
+
+                <div id="editor-area" class="hidden w-full h-full flex items-center justify-center relative">
+                    <canvas id="crop-canvas" class="max-w-full max-h-[600px] shadow-lg"></canvas>
+                </div>
+            </div>
+            <div
+                class="w-full md:w-80 bg-white dark:bg-gray-800 border-l border-gray-200 dark:border-gray-700 p-6 flex flex-col gap-6">
+
+                <div id="controls-panel" class="opacity-50 pointer-events-none transition-opacity duration-200">
+
+                    <div class="space-y-4">
+                        <label class="block text-sm font-medium text-gray-700 dark:text-gray-300">Aspect Ratio</label>
+                        <div class="grid grid-cols-3 gap-2">
+                            <button
+                                class="ratio-btn px-3 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-brand-500 transition-colors active text-brand-600 dark:text-brand-400"
+                                data-ratio="free">Free</button>
+                            <button
+                                class="ratio-btn px-3 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-brand-500 transition-colors"
+                                data-ratio="1:1">1:1</button>
+                            <button
+                                class="ratio-btn px-3 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-brand-500 transition-colors"
+                                data-ratio="16:9">16:9</button>
+                            <button
+                                class="ratio-btn px-3 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-brand-500 transition-colors"
+                                data-ratio="4:3">4:3</button>
+                            <button
+                                class="ratio-btn px-3 py-2 text-sm font-medium bg-gray-100 dark:bg-gray-700 rounded-md hover:bg-gray-200 dark:hover:bg-gray-600 focus:ring-2 focus:ring-brand-500 transition-colors"
+                                data-ratio="circle">Circle</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-4 mt-6">
+                        <label for="rotation-slider"
+                            class="block text-sm font-medium text-gray-700 dark:text-gray-300">Rotation (<span
+                                id="rotation-val">0</span>°)</label>
+                        <div class="flex items-center gap-4">
+                            <button id="rotate-left" class="p-2 text-gray-500 hover:text-brand-500 transition-colors"
+                                title="Rotate -90°">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M3 10h10a8 8 0 018 8v2M3 10l6 6m-6-6l6-6"></path>
+                                </svg>
+                            </button>
+                            <input type="range" id="rotation-slider" min="0" max="360" value="0"
+                                class="w-full h-2 bg-gray-200 rounded-lg appearance-none cursor-pointer dark:bg-gray-700">
+                            <button id="rotate-right" class="p-2 text-gray-500 hover:text-brand-500 transition-colors"
+                                title="Rotate +90°">
+                                <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                        d="M21 10h-10a8 8 0 00-8 8v2M21 10l-6 6m6-6l-6-6"></path>
+                                </svg>
+                            </button>
+                        </div>
+                    </div>
+
+                    <div class="mt-8 pt-6 border-t border-gray-200 dark:border-gray-700">
+                        <button id="download-btn"
+                            class="w-full py-3 bg-brand-600 hover:bg-brand-700 text-white font-bold rounded-xl shadow-lg shadow-brand-500/40 transition-all transform active:scale-95 flex items-center justify-center gap-2">
+                            <svg class="w-5 h-5" fill="none" stroke="currentColor" viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                            </svg>
+                            Download Image
+                        </button>
+                    </div>
+
+                </div>
+            </div>
+        </div>
+
+        <section class="max-w-5xl mx-auto mt-20 mb-16">
+            <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">How It Works</h2>
+
+            <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
+                <div
+                    class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow text-center group">
+                    <div
+                        class="w-14 h-14 mx-auto mb-4 bg-blue-50 dark:bg-blue-900/30 text-brand-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M7 16a4 4 0 01-.88-7.903A5 5 0 1115.9 6L16 6a5 5 0 011 9.9M15 13l-3-3m0 0l-3 3m3-3v12">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">1. Upload</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Drag & drop your image or click to browse files.
+                    </p>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow text-center group">
+                    <div
+                        class="w-14 h-14 mx-auto mb-4 bg-indigo-50 dark:bg-indigo-900/30 text-indigo-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 8V4m0 0h4M4 4l5 5m11-1V4m0 0h-4m4 4l-5 5M4 16v4m0 0h4m-4 0l5-5m11 5l-5-5m5 5v-4m0 4h-4">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">2. Crop</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Resize the frame or pick a preset aspect ratio.
+                    </p>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow text-center group">
+                    <div
+                        class="w-14 h-14 mx-auto mb-4 bg-purple-50 dark:bg-purple-900/30 text-purple-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 4v5h.582m15.356 2A8.001 8.001 0 004.582 9m0 0H9m11 11v-5h-.581m0 0a8.003 8.003 0 01-15.357-2m15.357 2H15">
+                            </path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">3. Rotate</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Fine-tune the angle to get the perfect
+                        alignment.</p>
+                </div>
+
+                <div
+                    class="bg-white dark:bg-gray-800 p-6 rounded-2xl shadow-sm border border-gray-100 dark:border-gray-700 hover:shadow-md transition-shadow text-center group">
+                    <div
+                        class="w-14 h-14 mx-auto mb-4 bg-emerald-50 dark:bg-emerald-900/30 text-emerald-500 rounded-xl flex items-center justify-center group-hover:scale-110 transition-transform duration-300">
+                        <svg class="w-7 h-7" fill="none" stroke="currentColor" viewBox="0 0 24 24"
+                            xmlns="http://www.w3.org/2000/svg">
+                            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-4l-4 4m0 0l-4-4m4 4V4"></path>
+                        </svg>
+                    </div>
+                    <h3 class="text-lg font-semibold mb-2 text-gray-900 dark:text-white">4. Download</h3>
+                    <p class="text-sm text-gray-500 dark:text-gray-400">Save the result instantly in high quality.</p>
+                </div>
+            </div>
+
+            <div class="mt-20 max-w-3xl mx-auto">
+                <h2 class="text-3xl font-bold text-center mb-12 text-gray-900 dark:text-white">Frequently Asked
+                    Questions</h2>
+
+                <div class="space-y-4">
+                    <details
+                        class="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer focus:outline-none">
+                            <span class="font-medium text-gray-900 dark:text-white">Is my image uploaded to a
+                                server?</span>
+                            <svg class="chevron w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="px-5 pb-5 pt-0 text-gray-600 dark:text-gray-300 leading-relaxed">
+                            No. All processing happens entirely within your browser using modern web technologies. Your
+                            photos never leave your device, ensuring 100% privacy.
+                        </div>
+                    </details>
+
+                    <details
+                        class="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer focus:outline-none">
+                            <span class="font-medium text-gray-900 dark:text-white">What image formats are
+                                supported?</span>
+                            <svg class="chevron w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="px-5 pb-5 pt-0 text-gray-600 dark:text-gray-300 leading-relaxed">
+                            We support all common web image formats including JPG, PNG, and WebP. The tool works best
+                            with high-resolution images.
+                        </div>
+                    </details>
+
+                    <details
+                        class="group bg-white dark:bg-gray-800 rounded-xl shadow-sm border border-gray-100 dark:border-gray-700 overflow-hidden">
+                        <summary class="flex items-center justify-between p-5 cursor-pointer focus:outline-none">
+                            <span class="font-medium text-gray-900 dark:text-white">Is it free to use?</span>
+                            <svg class="chevron w-5 h-5 text-gray-400" fill="none" stroke="currentColor"
+                                viewBox="0 0 24 24">
+                                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2"
+                                    d="M19 9l-7 7-7-7"></path>
+                            </svg>
+                        </summary>
+                        <div class="px-5 pb-5 pt-0 text-gray-600 dark:text-gray-300 leading-relaxed">
+                            Yes, it is completely free to use with no hidden costs, watermarks, or limitations on the
+                            number of images you can process.
+                        </div>
+                    </details>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="bg-white dark:bg-gray-900 border-t border-gray-200 dark:border-gray-800 mt-12 py-12">
+        <div class="container mx-auto px-4">
+            <div class="grid grid-cols-2 md:grid-cols-4 gap-8 mb-8">
+                <div>
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-4 uppercase text-sm tracking-wider">Legal</h3>
+                    <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a href="https://pvdspot.com/privacy-policy.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">Privacy Policy</a></li>
+                        <li><a href="https://pvdspot.com/terms-of-use.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h3 class="font-bold text-gray-900 dark:text-white mb-4 uppercase text-sm tracking-wider">Company
+                    </h3>
+                    <ul class="space-y-2 text-sm text-gray-600 dark:text-gray-400">
+                        <li><a href="https://pvdspot.com/about-us.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-gray-200 dark:border-gray-800 pt-8 text-center md:text-left">
+                <p class="text-sm text-gray-500 dark:text-gray-400">
+                    &copy; <span id="year"></span> <a href="/" class="hover:text-brand-500 transition-colors">Crop
+                        Image</a>. All Rights Reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cookie-consent"
+        class="fixed bottom-0 left-0 right-0 bg-white/95 dark:bg-gray-900/95 backdrop-blur shadow-[0_-4px_6px_-1px_rgba(0,0,0,0.1)] p-4 transform translate-y-full transition-transform duration-300 z-50 border-t border-gray-200 dark:border-gray-700">
+        <div class="container mx-auto flex flex-col md:flex-row items-center justify-between gap-4">
+            <p class="text-sm text-gray-600 dark:text-gray-300 text-center md:text-left">
+                We use cookies to ensure you get the best experience on our website.
+            </p>
+            <button id="cookie-accept"
+                class="px-6 py-2 bg-brand-500 hover:bg-brand-600 text-white text-sm font-medium rounded-lg transition-colors whitespace-nowrap">
+                Got It
+            </button>
+        </div>
+    </div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+
+            const state = {
+                image: null,
+                rotation: 0,
+                scale: 1,
+                cropRect: { x: 0, y: 0, width: 0, height: 0 },
+                aspectRatio: null,
+                isDragging: false,
+                dragType: null,
+                lastMousePos: { x: 0, y: 0 },
+                canvasSize: { width: 0, height: 0 }
+            };
+
+            const CONSTANTS = {
+                HANDLE_SIZE: 20,
+                MIN_CROP_SIZE: 50,
+                OVERLAY_COLOR: 'rgba(0, 0, 0, 0.5)',
+                BORDER_COLOR: '#0ea5e9',
+                HANDLE_COLOR: '#ffffff'
+            };
+
+            const els = {
+                uploadArea: document.getElementById('upload-area'),
+                fileInput: document.getElementById('file-input'),
+                editorArea: document.getElementById('editor-area'),
+                canvas: document.getElementById('crop-canvas'),
+                controlsPanel: document.getElementById('controls-panel'),
+                rotationSlider: document.getElementById('rotation-slider'),
+                rotationVal: document.getElementById('rotation-val'),
+                rotateLeftBtn: document.getElementById('rotate-left'),
+                rotateRightBtn: document.getElementById('rotate-right'),
+                downloadBtn: document.getElementById('download-btn'),
+                ratioBtns: document.querySelectorAll('.ratio-btn')
+            };
+
+            const ctx = els.canvas.getContext('2d');
+
+            const themeToggleBtn = document.getElementById('theme-toggle');
+            const html = document.documentElement;
+
+            function toggleTheme() {
+                if (html.classList.contains('dark')) {
+                    html.classList.remove('dark');
+                    localStorage.setItem('color-theme', 'light');
+                    document.getElementById('theme-toggle-dark-icon').classList.remove('hidden');
+                    document.getElementById('theme-toggle-light-icon').classList.add('hidden');
+                } else {
+                    html.classList.add('dark');
+                    localStorage.setItem('color-theme', 'dark');
+                    document.getElementById('theme-toggle-dark-icon').classList.add('hidden');
+                    document.getElementById('theme-toggle-light-icon').classList.remove('hidden');
+                }
+            }
+
+            if (localStorage.getItem('color-theme') === 'dark' || (!('color-theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+                html.classList.add('dark');
+                document.getElementById('theme-toggle-dark-icon').classList.add('hidden');
+                document.getElementById('theme-toggle-light-icon').classList.remove('hidden');
+            } else {
+                document.getElementById('theme-toggle-dark-icon').classList.remove('hidden');
+                document.getElementById('theme-toggle-light-icon').classList.add('hidden');
+            }
+            themeToggleBtn.addEventListener('click', toggleTheme);
+
+            els.uploadArea.addEventListener('click', () => els.fileInput.click());
+            els.uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); els.uploadArea.classList.add('border-brand-500'); });
+            els.uploadArea.addEventListener('dragleave', () => els.uploadArea.classList.remove('border-brand-500'));
+            els.uploadArea.addEventListener('drop', (e) => {
+                e.preventDefault();
+                els.uploadArea.classList.remove('border-brand-500');
+                if (e.dataTransfer.files.length) handleFile(e.dataTransfer.files[0]);
+            });
+            els.fileInput.addEventListener('change', (e) => {
+                if (e.target.files.length) handleFile(e.target.files[0]);
+            });
+
+            function handleFile(file) {
+                if (!file.type.match('image.*')) return alert('Please upload an image.');
+
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    const img = new Image();
+                    img.onload = () => {
+                        state.image = img;
+                        state.rotation = 0;
+                        els.rotationSlider.value = 0;
+                        els.rotationVal.textContent = 0;
+                        initEditor();
+                    };
+                    img.src = e.target.result;
+                };
+                reader.readAsDataURL(file);
+            }
+
+            function initEditor() {
+                els.uploadArea.classList.add('hidden');
+                els.editorArea.classList.remove('hidden');
+                els.controlsPanel.classList.remove('opacity-50', 'pointer-events-none');
+
+                const container = els.editorArea;
+                const maxWidth = container.clientWidth;
+                const maxHeight = 600;
+                const scale = Math.min(maxWidth / state.image.width, maxHeight / state.image.height);
+                state.canvasSize.width = state.image.width * scale;
+                state.canvasSize.height = state.image.height * scale;
+                state.scale = scale;
+
+                els.canvas.width = state.canvasSize.width;
+                els.canvas.height = state.canvasSize.height;
+
+                const cropW = state.canvasSize.width * 0.8;
+                const cropH = state.canvasSize.height * 0.8;
+                state.cropRect = {
+                    x: (state.canvasSize.width - cropW) / 2,
+                    y: (state.canvasSize.height - cropH) / 2,
+                    width: cropW,
+                    height: cropH
+                };
+
+                draw();
+            }
+
+            function draw() {
+                if (!state.image) return;
+
+                ctx.clearRect(0, 0, els.canvas.width, els.canvas.height);
+
+                ctx.save();
+                ctx.translate(els.canvas.width / 2, els.canvas.height / 2);
+                ctx.rotate(state.rotation * Math.PI / 180);
+
+                ctx.drawImage(
+                    state.image,
+                    -state.canvasSize.width / 2,
+                    -state.canvasSize.height / 2,
+                    state.canvasSize.width,
+                    state.canvasSize.height
+                );
+                ctx.restore();
+
+                ctx.fillStyle = CONSTANTS.OVERLAY_COLOR;
+                ctx.beginPath();
+                ctx.rect(0, 0, els.canvas.width, els.canvas.height);
+
+                if (state.aspectRatio === 'circle') {
+                    ctx.arc(
+                        state.cropRect.x + state.cropRect.width / 2,
+                        state.cropRect.y + state.cropRect.height / 2,
+                        state.cropRect.width / 2,
+                        0,
+                        2 * Math.PI,
+                        true
+                    );
+                } else {
+                    ctx.rect(
+                        state.cropRect.x,
+                        state.cropRect.y,
+                        state.cropRect.width,
+                        state.cropRect.height
+                    );
+                }
+                ctx.fill('evenodd');
+
+                ctx.strokeStyle = CONSTANTS.BORDER_COLOR;
+                ctx.lineWidth = 2;
+
+                if (state.aspectRatio === 'circle') {
+                    ctx.beginPath();
+                    ctx.arc(
+                        state.cropRect.x + state.cropRect.width / 2,
+                        state.cropRect.y + state.cropRect.height / 2,
+                        state.cropRect.width / 2,
+                        0, 2 * Math.PI
+                    );
+                    ctx.stroke();
+                } else {
+                    ctx.strokeRect(state.cropRect.x, state.cropRect.y, state.cropRect.width, state.cropRect.height);
+
+                    ctx.beginPath();
+                    ctx.strokeStyle = 'rgba(255, 255, 255, 0.5)';
+                    ctx.lineWidth = 1;
+                    ctx.moveTo(state.cropRect.x + state.cropRect.width / 3, state.cropRect.y);
+                    ctx.lineTo(state.cropRect.x + state.cropRect.width / 3, state.cropRect.y + state.cropRect.height);
+                    ctx.moveTo(state.cropRect.x + 2 * state.cropRect.width / 3, state.cropRect.y);
+                    ctx.lineTo(state.cropRect.x + 2 * state.cropRect.width / 3, state.cropRect.y + state.cropRect.height);
+                    ctx.moveTo(state.cropRect.x, state.cropRect.y + state.cropRect.height / 3);
+                    ctx.lineTo(state.cropRect.x + state.cropRect.width, state.cropRect.y + state.cropRect.height / 3);
+                    ctx.moveTo(state.cropRect.x, state.cropRect.y + 2 * state.cropRect.height / 3);
+                    ctx.lineTo(state.cropRect.x + state.cropRect.width, state.cropRect.y + 2 * state.cropRect.height / 3);
+                    ctx.stroke();
+                }
+
+                if (state.aspectRatio !== 'circle') {
+                    drawHandle(state.cropRect.x, state.cropRect.y);
+                    drawHandle(state.cropRect.x + state.cropRect.width, state.cropRect.y);
+                    drawHandle(state.cropRect.x, state.cropRect.y + state.cropRect.height);
+                    drawHandle(state.cropRect.x + state.cropRect.width, state.cropRect.y + state.cropRect.height);
+                }
+            }
+
+            function drawHandle(x, y) {
+                ctx.fillStyle = CONSTANTS.HANDLE_COLOR;
+                ctx.fillRect(x - CONSTANTS.HANDLE_SIZE / 2, y - CONSTANTS.HANDLE_SIZE / 2, CONSTANTS.HANDLE_SIZE, CONSTANTS.HANDLE_SIZE);
+            }
+
+            function getMousePos(e) {
+                const rect = els.canvas.getBoundingClientRect();
+                return {
+                    x: (e.clientX || e.touches[0].clientX) - rect.left,
+                    y: (e.clientY || e.touches[0].clientY) - rect.top
+                };
+            }
+
+            function isInsideRect(pos, rect) {
+                return pos.x >= rect.x && pos.x <= rect.x + rect.width &&
+                    pos.y >= rect.y && pos.y <= rect.y + rect.height;
+            }
+
+            function getHandle(pos) {
+                const s = CONSTANTS.HANDLE_SIZE * 2;
+                const r = state.cropRect;
+                if (Math.abs(pos.x - r.x) < s && Math.abs(pos.y - r.y) < s) return 'nw';
+                if (Math.abs(pos.x - (r.x + r.width)) < s && Math.abs(pos.y - r.y) < s) return 'ne';
+                if (Math.abs(pos.x - r.x) < s && Math.abs(pos.y - (r.y + r.height)) < s) return 'sw';
+                if (Math.abs(pos.x - (r.x + r.width)) < s && Math.abs(pos.y - (r.y + r.height)) < s) return 'se';
+                return null;
+            }
+
+            ['mousedown', 'touchstart'].forEach(evt => els.canvas.addEventListener(evt, onPointerDown));
+            ['mousemove', 'touchmove'].forEach(evt => window.addEventListener(evt, onPointerMove));
+            ['mouseup', 'touchend'].forEach(evt => window.addEventListener(evt, onPointerUp));
+
+            function onPointerDown(e) {
+                if (!state.image) return;
+                const pos = getMousePos(e);
+
+                state.dragType = getHandle(pos);
+                if (!state.dragType && isInsideRect(pos, state.cropRect)) {
+                    state.dragType = 'move';
+                }
+
+                if (state.dragType) {
+                    state.isDragging = true;
+                    state.lastMousePos = pos;
+                }
+            }
+
+            function onPointerMove(e) {
+                const pos = getMousePos(e);
+
+                if (state.isDragging) {
+                    e.preventDefault();
+                    const dx = pos.x - state.lastMousePos.x;
+                    const dy = pos.y - state.lastMousePos.y;
+
+                    if (state.dragType === 'move') {
+                        state.cropRect.x += dx;
+                        state.cropRect.y += dy;
+                    } else {
+                        if (state.dragType.includes('w')) {
+                            state.cropRect.x += dx;
+                            state.cropRect.width -= dx;
+                        }
+                        if (state.dragType.includes('n')) {
+                            state.cropRect.y += dy;
+                            state.cropRect.height -= dy;
+                        }
+                        if (state.dragType.includes('e')) {
+                            state.cropRect.width += dx;
+                        }
+                        if (state.dragType.includes('s')) {
+                            state.cropRect.height += dy;
+                        }
+
+                        if (state.aspectRatio && state.aspectRatio !== 'free' && state.aspectRatio !== 'circle') {
+                            const [rw, rh] = state.aspectRatio.split(':').map(Number);
+                            const ratio = rw / rh;
+                            state.cropRect.height = state.cropRect.width / ratio;
+                        }
+                        if (state.aspectRatio === 'circle') {
+                            state.cropRect.height = state.cropRect.width;
+                        }
+                    }
+
+                    if (state.cropRect.width < CONSTANTS.MIN_CROP_SIZE) state.cropRect.width = CONSTANTS.MIN_CROP_SIZE;
+                    if (state.cropRect.height < CONSTANTS.MIN_CROP_SIZE) state.cropRect.height = CONSTANTS.MIN_CROP_SIZE;
+
+                    state.lastMousePos = pos;
+                    draw();
+                } else {
+                    const handle = getHandle(pos);
+                    if (handle) {
+                        els.canvas.style.cursor = `${handle}-resize`;
+                    } else if (isInsideRect(pos, state.cropRect)) {
+                        els.canvas.style.cursor = 'move';
+                    } else {
+                        els.canvas.style.cursor = 'default';
+                    }
+                }
+            }
+
+            function onPointerUp() {
+                state.isDragging = false;
+                state.dragType = null;
+            }
+
+            els.rotationSlider.addEventListener('input', (e) => {
+                state.rotation = parseInt(e.target.value);
+                els.rotationVal.textContent = state.rotation;
+                draw();
+            });
+
+            els.rotateLeftBtn.addEventListener('click', () => {
+                state.rotation = (state.rotation - 90 + 360) % 360;
+                updateRotationUI();
+            });
+
+            els.rotateRightBtn.addEventListener('click', () => {
+                state.rotation = (state.rotation + 90) % 360;
+                updateRotationUI();
+            });
+
+            function updateRotationUI() {
+                els.rotationSlider.value = state.rotation;
+                els.rotationVal.textContent = state.rotation;
+                draw();
+            }
+
+            els.ratioBtns.forEach(btn => {
+                btn.addEventListener('click', () => {
+                    els.ratioBtns.forEach(b => b.classList.remove('text-brand-600', 'dark:text-brand-400'));
+                    btn.classList.add('text-brand-600', 'dark:text-brand-400');
+
+                    state.aspectRatio = btn.dataset.ratio;
+
+                    const r = state.canvasSize;
+                    let w = r.width * 0.6;
+                    let h = r.height * 0.6;
+
+                    if (state.aspectRatio !== 'free' && state.aspectRatio !== 'circle') {
+                        const [rw, rh] = state.aspectRatio.split(':').map(Number);
+                        const ratio = rw / rh;
+                        h = w / ratio;
+                    } else if (state.aspectRatio === 'circle') {
+                        h = w;
+                    }
+
+                    state.cropRect = {
+                        x: (r.width - w) / 2,
+                        y: (r.height - h) / 2,
+                        width: w,
+                        height: h
+                    };
+                    draw();
+                });
+            });
+
+            els.downloadBtn.addEventListener('click', () => {
+                if (!state.image) return;
+
+                const tempCanvas = document.createElement('canvas');
+                const tCtx = tempCanvas.getContext('2d');
+
+                const realX = state.cropRect.x / state.scale;
+                const realY = state.cropRect.y / state.scale;
+                const realW = state.cropRect.width / state.scale;
+                const realH = state.cropRect.height / state.scale;
+
+                tempCanvas.width = realW;
+                tempCanvas.height = realH;
+
+                const maxSize = Math.max(state.image.width, state.image.height);
+                const rotCanvas = document.createElement('canvas');
+                rotCanvas.width = maxSize * 1.5; // Padding for rotation
+                rotCanvas.height = maxSize * 1.5;
+                const rCtx = rotCanvas.getContext('2d');
+
+                rCtx.translate(rotCanvas.width / 2, rotCanvas.height / 2);
+                rCtx.rotate(state.rotation * Math.PI / 180);
+                rCtx.drawImage(state.image, -state.image.width / 2, -state.image.height / 2);
+
+                const cx = rotCanvas.width / 2;
+                const cy = rotCanvas.height / 2;
+
+                const dcx = els.canvas.width / 2;
+                const dcy = els.canvas.height / 2;
+
+                const vx = state.cropRect.x - dcx;
+                const vy = state.cropRect.y - dcy;
+
+                const rvx = vx / state.scale;
+                const rvy = vy / state.scale;
+
+                const sx = cx + rvx;
+                const sy = cy + rvy;
+
+                tCtx.drawImage(
+                    rotCanvas,
+                    sx, sy, realW, realH,
+                    0, 0, realW, realH
+                );
+
+                if (state.aspectRatio === 'circle') {
+                    const finalC = document.createElement('canvas');
+                    finalC.width = realW;
+                    finalC.height = realH;
+                    const fCtx = finalC.getContext('2d');
+                    fCtx.beginPath();
+                    fCtx.arc(realW / 2, realH / 2, realW / 2, 0, 2 * Math.PI);
+                    fCtx.clip();
+                    fCtx.drawImage(tempCanvas, 0, 0);
+
+                    triggerDownload(finalC);
+                } else {
+                    triggerDownload(tempCanvas);
+                }
+            });
+
+            function triggerDownload(canvas) {
+                const link = document.createElement('a');
+                link.download = 'cropped-image.png';
+                link.href = canvas.toDataURL('image/png');
+                link.click();
+            }
+
+            document.getElementById('year').textContent = new Date().getFullYear();
+            if (!localStorage.getItem('cookie-consent')) {
+                setTimeout(() => document.getElementById('cookie-consent').classList.remove('translate-y-full'), 1000);
+            }
+            document.getElementById('cookie-accept').addEventListener('click', () => {
+                localStorage.setItem('cookie-consent', 'true');
+                document.getElementById('cookie-consent').classList.add('translate-y-full');
+            });
+
+        });
+    </script>
+</body>
+
+</html>
