@@ -1,0 +1,655 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Image - Free Online Image Cropping Tool</title>
+    <meta name="description" content="Free online tool to crop, rotate, flip, and resize images. Supports multiple formats and aspect ratios. Fast, secure, and client-side only.">
+    <meta name="keywords" content="crop image, image cropper, photo editor, rotate image, flip image, free online tool">
+    <link rel="canonical" href="https://crop-image.pvdspot.com/">
+
+    <meta property="og:type" content="website">
+    <meta property="og:url" content="https://crop-image.pvdspot.com/">
+    <meta property="og:title" content="Crop Image - Free Online Image Cropping Tool">
+    <meta property="og:description" content="Crop, rotate, flip, and resize images instantly in your browser. No upload required - 100% client-side secure processing.">
+    <meta property="og:image" content="https://crop-image.pvdspot.com/og-image.svg">
+
+    <meta property="twitter:card" content="summary_large_image">
+    <meta property="twitter:url" content="https://crop-image.pvdspot.com/">
+    <meta property="twitter:title" content="Crop Image - Free Online Image Cropping Tool">
+    <meta property="twitter:description" content="Crop, rotate, flip, and resize images instantly in your browser. No upload required - 100% client-side secure processing.">
+    <meta property="twitter:image" content="https://crop-image.pvdspot.com/og-image.svg">
+
+    <link rel="icon" type="image/x-icon" href="/favicon.ico">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.css" crossorigin="anonymous" referrerpolicy="no-referrer" />
+
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        primary: {
+                            50: '#eff6ff',
+                            100: '#dbeafe',
+                            200: '#bfdbfe',
+                            300: '#93c5fd',
+                            400: '#60a5fa',
+                            500: '#3b82f6',
+                            600: '#2563eb',
+                            700: '#1d4ed8',
+                            800: '#1e40af',
+                            900: '#1e3a8a',
+                            950: '#172554',
+                        }
+                    },
+                    animation: {
+                        'fade-in': 'fadeIn 0.5s ease-out forwards',
+                        'slide-up': 'slideUp 0.5s ease-out forwards',
+                    },
+                    keyframes: {
+                        fadeIn: {
+                            '0%': { opacity: '0' },
+                            '100%': { opacity: '1' },
+                        },
+                        slideUp: {
+                            '0%': { opacity: '0', transform: 'translateY(20px)' },
+                            '100%': { opacity: '1', transform: 'translateY(0)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+
+    <style>
+        ::-webkit-scrollbar {
+            width: 8px;
+            height: 8px;
+        }
+        ::-webkit-scrollbar-track {
+            background: transparent;
+        }
+        ::-webkit-scrollbar-thumb {
+            background: #cbd5e1;
+            border-radius: 4px;
+        }
+        .dark ::-webkit-scrollbar-thumb {
+            background: #475569;
+        }
+        ::-webkit-scrollbar-thumb:hover {
+            background: #94a3b8;
+        }
+        .dark ::-webkit-scrollbar-thumb:hover {
+            background: #64748b;
+        }
+
+        .glass {
+            background: rgba(255, 255, 255, 0.7);
+            -webkit-backdrop-filter: blur(10px);
+            backdrop-filter: blur(10px);
+            border: 1px solid rgba(255, 255, 255, 0.2);
+        }
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.7);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+        }
+
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: 0;
+            transition: border-radius 0.3s;
+        }
+        .cropper-view-box.rounded-circle {
+            border-radius: 50%;
+            outline: 0;
+            box-shadow: 0 0 0 1px #3b82f6;
+        }
+        .cropper-point {
+            background-color: #3b82f6;
+        }
+        .cropper-line {
+            background-color: #3b82f6;
+        }
+    </style>
+</head>
+<body class="bg-slate-50 text-slate-900 dark:bg-slate-950 dark:text-slate-100 transition-colors duration-300 min-h-screen flex flex-col">
+
+    <header class="fixed top-0 w-full z-50 glass transition-all duration-300">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 h-16 flex items-center justify-between">
+            <a href="/" class="flex items-center gap-2 group" aria-label="Crop Image Home">
+                <div class="w-8 h-8 text-primary-500 transition-transform group-hover:scale-110">
+                   <svg viewBox="0 0 512 512" fill="none" class="w-full h-full">
+                        <path d="M128 448H384C419.3 448 448 419.3 448 384V128C448 92.7 419.3 64 384 64H128C92.7 64 64 92.7 64 128V384C64 419.3 92.7 448 128 448Z" fill="currentColor"/>
+                        <path d="M352 160H192C174.3 160 160 174.3 160 192V352" stroke="white" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+                        <path d="M160 352H320C337.7 352 352 337.7 352 320V160" stroke="white" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+                   </svg>
+                </div>
+                <span class="font-bold text-xl tracking-tight">Crop Image</span>
+            </a>
+
+            <button id="theme-toggle" class="p-2 rounded-full hover:bg-slate-200 dark:hover:bg-slate-800 transition-colors focus:outline-none focus:ring-2 focus:ring-primary-500" aria-label="Toggle Dark Mode">
+                <i data-lucide="sun" class="w-5 h-5 hidden dark:block"></i>
+                <i data-lucide="moon" class="w-5 h-5 block dark:hidden"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow pt-24 pb-12 px-4 sm:px-6 lg:px-8 max-w-7xl mx-auto w-full">
+        
+        <section id="upload-section" class="text-center py-12 animate-fade-in">
+            <h1 class="text-4xl md:text-5xl font-bold mb-4 bg-clip-text text-transparent bg-gradient-to-r from-primary-600 to-indigo-600 dark:from-primary-400 dark:to-indigo-400">
+                Crop Image Online
+            </h1>
+            <p class="text-lg text-slate-600 dark:text-slate-400 mb-8 max-w-2xl mx-auto">
+                The simplest way to crop, rotate, and edit your images right in your browser. Secure, fast, and free.
+            </p>
+
+            <div class="max-w-xl mx-auto">
+                <div class="relative group cursor-pointer">
+                    <input type="file" id="image-input" accept="image/*" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer z-10" aria-label="Upload Image">
+                    <div class="glass rounded-2xl border-2 border-dashed border-slate-300 dark:border-slate-700 p-10 transition-all group-hover:border-primary-500 group-hover:scale-[1.01] shadow-sm group-hover:shadow-md">
+                        <div class="flex flex-col items-center gap-4">
+                            <div class="w-16 h-16 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-600 dark:text-primary-400">
+                                <i data-lucide="upload" class="w-8 h-8"></i>
+                            </div>
+                            <div>
+                                <h3 class="text-lg font-semibold">Click to upload or drag and drop</h3>
+                                <p class="text-sm text-slate-500 dark:text-slate-400 mt-1">SVG, PNG, JPG or GIF (max 10MB)</p>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section id="editor-section" class="hidden">
+            <div class="glass rounded-2xl overflow-hidden shadow-xl border border-slate-200 dark:border-slate-800">
+                <div class="flex flex-col lg:flex-row h-[80vh] lg:h-[700px]">
+                    
+                    <div class="flex-grow bg-slate-900/5 dark:bg-slate-900/50 relative flex items-center justify-center p-4 overflow-hidden">
+                        <img id="image-preview" src="" alt="Preview" class="max-w-full max-h-full block opacity-0">
+                    </div>
+
+                    <div class="w-full lg:w-80 bg-white/50 dark:bg-slate-900/50 border-t lg:border-t-0 lg:border-l border-slate-200 dark:border-slate-800 p-6 flex flex-col gap-6 overflow-y-auto backdrop-blur-sm">
+                        
+                        <div>
+                            <label class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 block">Aspect Ratio</label>
+                            <div class="grid grid-cols-3 gap-2">
+                                <button class="ratio-btn px-3 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-colors" data-ratio="NaN">Free</button>
+                                <button class="ratio-btn px-3 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-colors" data-ratio="1">1:1</button>
+                                <button class="ratio-btn px-3 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-colors" data-ratio="1.7777777777">16:9</button>
+                                <button class="ratio-btn px-3 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-colors" data-ratio="1.3333333333">4:3</button>
+                                <button class="ratio-btn px-3 py-2 rounded-lg text-sm font-medium bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 hover:text-primary-600 dark:hover:text-primary-400 transition-colors" data-ratio="0.6666666667">2:3</button>
+                            </div>
+                        </div>
+
+                        <div>
+                            <label class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 block">Transform</label>
+                            <div class="flex gap-2 mb-2">
+                                <button id="rotate-left" class="flex-1 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors" aria-label="Rotate Left">
+                                    <i data-lucide="rotate-ccw" class="w-5 h-5 mx-auto"></i>
+                                </button>
+                                <button id="rotate-right" class="flex-1 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors" aria-label="Rotate Right">
+                                    <i data-lucide="rotate-cw" class="w-5 h-5 mx-auto"></i>
+                                </button>
+                            </div>
+                            <div class="flex gap-2">
+                                <button id="flip-horizontal" class="flex-1 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors" aria-label="Flip Horizontal">
+                                    <i data-lucide="flip-horizontal" class="w-5 h-5 mx-auto"></i>
+                                </button>
+                                <button id="flip-vertical" class="flex-1 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors" aria-label="Flip Vertical">
+                                    <i data-lucide="flip-vertical" class="w-5 h-5 mx-auto"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                         <div>
+                            <label class="text-sm font-semibold text-slate-500 dark:text-slate-400 uppercase tracking-wider mb-3 block">Shape</label>
+                            <div class="flex gap-2">
+                                <button id="shape-rect" class="flex-1 p-2 rounded-lg bg-primary-100 dark:bg-primary-900/50 text-primary-600 dark:text-primary-400 border border-primary-500 transition-colors" aria-label="Rectangle Shape">
+                                    <i data-lucide="square" class="w-5 h-5 mx-auto"></i>
+                                </button>
+                                <button id="shape-circle" class="flex-1 p-2 rounded-lg bg-slate-100 dark:bg-slate-800 hover:bg-primary-100 dark:hover:bg-primary-900/30 transition-colors" aria-label="Circle Shape">
+                                    <i data-lucide="circle" class="w-5 h-5 mx-auto"></i>
+                                </button>
+                            </div>
+                        </div>
+
+                        <div class="mt-auto flex flex-col gap-3">
+                            <button id="download-btn" class="w-full py-3 px-4 bg-primary-600 hover:bg-primary-700 text-white rounded-xl font-semibold shadow-lg shadow-primary-500/30 transition-all transform hover:scale-[1.02] flex items-center justify-center gap-2">
+                                <i data-lucide="download" class="w-5 h-5"></i>
+                                Download Crop
+                            </button>
+                             <button id="reset-btn" class="w-full py-2 px-4 bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:bg-slate-50 dark:hover:bg-slate-700 rounded-xl font-medium transition-colors">
+                                Reset Image
+                            </button>
+                            <button id="new-image-btn" class="w-full py-2 px-4 text-slate-500 dark:text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 text-sm font-medium transition-colors">
+                                Open New Image
+                            </button>
+                        </div>
+
+                    </div>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-24 max-w-4xl mx-auto">
+            <h2 class="text-2xl font-bold mb-8 flex items-center gap-3">
+                <i data-lucide="book-open" class="text-primary-500"></i>
+                User Guide
+            </h2>
+            <div class="grid md:grid-cols-3 gap-6">
+                <div class="glass p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold mb-4">1</div>
+                    <h3 class="font-semibold mb-2">Upload Image</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Drag & drop your image or click the upload box to select a file from your device.</p>
+                </div>
+                <div class="glass p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold mb-4">2</div>
+                    <h3 class="font-semibold mb-2">Adjust & Crop</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Use the tools to rotate, flip, and select the area you want to keep. Choose aspect ratios or free crop.</p>
+                </div>
+                <div class="glass p-6 rounded-xl border border-slate-200 dark:border-slate-800">
+                    <div class="w-10 h-10 bg-primary-100 dark:bg-primary-900/30 rounded-full flex items-center justify-center text-primary-600 dark:text-primary-400 font-bold mb-4">3</div>
+                    <h3 class="font-semibold mb-2">Download</h3>
+                    <p class="text-slate-600 dark:text-slate-400 text-sm">Click "Download Crop" to save the edited image instantly to your device.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="mt-24 max-w-3xl mx-auto">
+            <h2 class="text-2xl font-bold mb-8 text-center">Frequently Asked Questions</h2>
+            <div class="space-y-4">
+                <div class="glass rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between font-medium focus:outline-none">
+                        <span>Is this tool free to use?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Yes, Crop Image is completely free to use. There are no hidden fees, subscriptions, or limits on the number of images you can edit.
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between font-medium focus:outline-none">
+                        <span>Is my data secure?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Absolutely. All image processing happens locally in your browser (client-side). Your images are never uploaded to any server, ensuring complete privacy and security.
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between font-medium focus:outline-none">
+                        <span>What image formats are supported?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            We support all major image formats including JPEG, PNG, WEBP, GIF, and BMP.
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between font-medium focus:outline-none">
+                        <span>Does crop quality reduce image quality?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            We strive to maintain the highest possible quality. The output quality largely depends on your original image resolution.
+                        </div>
+                    </div>
+                </div>
+                <div class="glass rounded-xl overflow-hidden border border-slate-200 dark:border-slate-800">
+                    <button class="faq-toggle w-full px-6 py-4 text-left flex items-center justify-between font-medium focus:outline-none">
+                        <span>Can I use this on mobile?</span>
+                        <i data-lucide="chevron-down" class="w-5 h-5 transition-transform duration-300"></i>
+                    </button>
+                    <div class="faq-content h-0 overflow-hidden transition-all duration-300 ease-in-out">
+                        <div class="px-6 pb-4 text-slate-600 dark:text-slate-400">
+                            Yes, our website is fully responsive and works perfectly on smartphones, tablets, and desktop computers.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <footer class="border-t border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900 mt-12">
+        <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-8 mb-8">
+                <div class="col-span-1 md:col-span-2">
+                    <a href="/" class="flex items-center gap-2 mb-4">
+                         <div class="w-6 h-6 text-primary-500">
+                           <svg viewBox="0 0 512 512" fill="none" class="w-full h-full">
+                                <path d="M128 448H384C419.3 448 448 419.3 448 384V128C448 92.7 419.3 64 384 64H128C92.7 64 64 92.7 64 128V384C64 419.3 92.7 448 128 448Z" fill="currentColor"/>
+                                <path d="M352 160H192C174.3 160 160 174.3 160 192V352" stroke="white" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+                                <path d="M160 352H320C337.7 352 352 337.7 352 320V160" stroke="white" stroke-width="32" stroke-linecap="round" stroke-linejoin="round"/>
+                           </svg>
+                        </div>
+                        <span class="font-bold text-lg">Crop Image</span>
+                    </a>
+                    <p class="text-slate-500 dark:text-slate-400 text-sm max-w-xs">
+                        A professional, free online tool to crop and edit images directly in your browser with privacy and ease.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4 text-slate-900 dark:text-white">Legal</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="https://pvdspot.com/privacy-policy.html" target="_blank" rel="noopener noreferrer" class="hover:text-primary-500 transition-colors">Privacy Policy</a></li>
+                        <li><a href="https://pvdspot.com/terms-of-use.html" target="_blank" rel="noopener noreferrer" class="hover:text-primary-500 transition-colors">Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-bold mb-4 text-slate-900 dark:text-white">Company</h4>
+                    <ul class="space-y-2 text-sm text-slate-500 dark:text-slate-400">
+                        <li><a href="https://pvdspot.com/about-us.html" target="_blank" rel="noopener noreferrer" class="hover:text-primary-500 transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div class="border-t border-slate-200 dark:border-slate-800 pt-8 flex flex-col md:flex-row justify-between items-center gap-4 text-sm text-slate-500 dark:text-slate-400">
+                <div>
+                    &copy; <span id="year"></span> <a href="/" class="hover:text-primary-500 transition-colors">Crop Image</a>. All Rights Reserved.
+                </div>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cookie-banner" class="fixed bottom-4 left-4 right-4 md:left-auto md:right-4 md:w-96 glass bg-white/90 dark:bg-slate-900/90 p-6 rounded-xl shadow-2xl border border-slate-200 dark:border-slate-800 transform translate-y-[150%] transition-transform duration-500 z-50">
+        <h4 class="font-bold text-lg mb-2">We use cookies</h4>
+        <p class="text-sm text-slate-600 dark:text-slate-400 mb-4">
+            We use cookies to enhance your experience and analyze our traffic. By continuing to visit this site you agree to our use of cookies.
+        </p>
+        <button id="cookie-accept" class="w-full py-2 bg-primary-600 hover:bg-primary-700 text-white rounded-lg font-medium transition-colors">
+            Got It
+        </button>
+    </div>
+
+    <script src="https://unpkg.com/lucide@latest"></script>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.1/cropper.min.js" crossorigin="anonymous" referrerpolicy="no-referrer"></script>
+
+    <script>
+        lucide.createIcons();
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+        
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            html.classList.toggle('dark');
+            if (html.classList.contains('dark')) {
+                localStorage.theme = 'dark';
+            } else {
+                localStorage.theme = 'light';
+            }
+        });
+
+        document.getElementById('year').textContent = new Date().getFullYear();
+
+        const cookieBanner = document.getElementById('cookie-banner');
+        const cookieAccept = document.getElementById('cookie-accept');
+
+        if (!localStorage.getItem('cookieConsent')) {
+            setTimeout(() => {
+                cookieBanner.classList.remove('translate-y-[150%]');
+            }, 1000);
+        }
+
+        cookieAccept.addEventListener('click', () => {
+            localStorage.setItem('cookieConsent', 'true');
+            cookieBanner.classList.add('translate-y-[150%]');
+        });
+
+        document.querySelectorAll('.faq-toggle').forEach(button => {
+            button.addEventListener('click', () => {
+                const content = button.nextElementSibling;
+                const icon = button.querySelector('i');
+                
+                if (content.style.height && content.style.height !== '0px') {
+                    content.style.height = '0px';
+                    icon.style.transform = 'rotate(0deg)';
+                } else {
+                    content.style.height = content.scrollHeight + 'px';
+                    icon.style.transform = 'rotate(180deg)';
+                }
+            });
+        });
+
+        const imageInput = document.getElementById('image-input');
+        const uploadSection = document.getElementById('upload-section');
+        const editorSection = document.getElementById('editor-section');
+        const imagePreview = document.getElementById('image-preview');
+        let cropper = null;
+        let isCircle = false;
+        let scaleX = 1;
+        let scaleY = 1;
+
+        function loadImage(file) {
+            if (!file || !file.type.startsWith('image/')) return;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = '';
+                imagePreview.classList.add('opacity-0');
+                
+                imagePreview.onload = () => {
+                    imagePreview.classList.remove('opacity-0');
+                    
+                    uploadSection.classList.add('hidden');
+                    editorSection.classList.remove('hidden');
+                    
+                    if (cropper) {
+                        cropper.destroy();
+                        cropper = null;
+                    }
+                    
+                    scaleX = 1;
+                    scaleY = 1;
+                    
+                    setTimeout(() => {
+                        cropper = new Cropper(imagePreview, {
+                            viewMode: 1,
+                            dragMode: 'move',
+                            aspectRatio: NaN,
+                            autoCropArea: 0.8,
+                            restore: false,
+                            guides: true,
+                            center: true,
+                            highlight: false,
+                            cropBoxMovable: true,
+                            cropBoxResizable: true,
+                            toggleDragModeOnDblclick: false,
+                            ready: function() {
+                                updateShapeUI();
+                            }
+                        });
+                    }, 100);
+                };
+
+                imagePreview.onerror = () => {
+                    console.error('Failed to load image');
+                    alert('Failed to load image. Please try another file.');
+                    uploadSection.classList.remove('hidden');
+                    editorSection.classList.add('hidden');
+                };
+                
+                imagePreview.src = e.target.result;
+            };
+            reader.readAsDataURL(file);
+        }
+
+        imageInput.addEventListener('change', (e) => {
+            if (e.target.files && e.target.files.length > 0) {
+                loadImage(e.target.files[0]);
+                imageInput.value = '';
+            }
+        });
+
+        document.querySelectorAll('.ratio-btn').forEach(btn => {
+            btn.addEventListener('click', () => {
+                if (!cropper) return;
+                
+                document.querySelectorAll('.ratio-btn').forEach(b => {
+                    b.classList.remove('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/30', 'dark:text-primary-400');
+                    b.classList.add('bg-slate-100', 'dark:bg-slate-800');
+                });
+                btn.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+                btn.classList.add('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/30', 'dark:text-primary-400');
+
+                const ratio = parseFloat(btn.dataset.ratio);
+                cropper.setAspectRatio(ratio);
+            });
+        });
+
+        document.getElementById('rotate-left').addEventListener('click', () => {
+            if (cropper) cropper.rotate(-90);
+        });
+        
+        document.getElementById('rotate-right').addEventListener('click', () => {
+            if (cropper) cropper.rotate(90);
+        });
+        
+        document.getElementById('flip-horizontal').addEventListener('click', () => {
+            if (!cropper) return;
+            scaleX = -scaleX;
+            cropper.scaleX(scaleX);
+        });
+        
+        document.getElementById('flip-vertical').addEventListener('click', () => {
+            if (!cropper) return;
+            scaleY = -scaleY;
+            cropper.scaleY(scaleY);
+        });
+
+        const shapeRectBtn = document.getElementById('shape-rect');
+        const shapeCircleBtn = document.getElementById('shape-circle');
+
+        function updateShapeUI() {
+            if (!cropper) return;
+            
+            if (isCircle) {
+                shapeCircleBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+                shapeCircleBtn.classList.add('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/50', 'dark:text-primary-400', 'border', 'border-primary-500');
+                
+                shapeRectBtn.classList.add('bg-slate-100', 'dark:bg-slate-800');
+                shapeRectBtn.classList.remove('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/50', 'dark:text-primary-400', 'border', 'border-primary-500');
+
+                const box = document.querySelector('.cropper-view-box');
+                const face = document.querySelector('.cropper-face');
+                if (box) box.classList.add('rounded-circle');
+                if (face) face.classList.add('rounded-circle');
+                
+                cropper.setAspectRatio(1);
+            } else {
+                shapeRectBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+                shapeRectBtn.classList.add('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/50', 'dark:text-primary-400', 'border', 'border-primary-500');
+                
+                shapeCircleBtn.classList.add('bg-slate-100', 'dark:bg-slate-800');
+                shapeCircleBtn.classList.remove('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/50', 'dark:text-primary-400', 'border', 'border-primary-500');
+
+                const box = document.querySelector('.cropper-view-box');
+                const face = document.querySelector('.cropper-face');
+                if (box) box.classList.remove('rounded-circle');
+                if (face) face.classList.remove('rounded-circle');
+                
+                cropper.setAspectRatio(NaN);
+            }
+        }
+
+        shapeRectBtn.addEventListener('click', () => {
+            if (!cropper) return;
+            isCircle = false;
+            updateShapeUI();
+        });
+
+        shapeCircleBtn.addEventListener('click', () => {
+            if (!cropper) return;
+            isCircle = true;
+            updateShapeUI();
+        });
+
+        document.getElementById('reset-btn').addEventListener('click', () => {
+            if (cropper) cropper.reset();
+        });
+
+        document.getElementById('new-image-btn').addEventListener('click', () => {
+            editorSection.classList.add('hidden');
+            uploadSection.classList.remove('hidden');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            imageInput.value = '';
+            scaleX = 1;
+            scaleY = 1;
+            isCircle = false;
+            
+            document.querySelectorAll('.ratio-btn').forEach(b => {
+                b.classList.remove('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/30', 'dark:text-primary-400');
+                b.classList.add('bg-slate-100', 'dark:bg-slate-800');
+            });
+            const freeBtn = document.querySelector('.ratio-btn[data-ratio="NaN"]');
+            if (freeBtn) {
+                freeBtn.classList.remove('bg-slate-100', 'dark:bg-slate-800');
+                freeBtn.classList.add('bg-primary-100', 'text-primary-600', 'dark:bg-primary-900/30', 'dark:text-primary-400');
+            }
+        });
+
+        document.getElementById('download-btn').addEventListener('click', () => {
+            if (!cropper) return;
+
+            const canvas = cropper.getCroppedCanvas();
+            
+            if (isCircle) {
+                const circleCanvas = document.createElement('canvas');
+                const ctx = circleCanvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+                
+                circleCanvas.width = width;
+                circleCanvas.height = height;
+                
+                ctx.beginPath();
+                ctx.arc(width / 2, height / 2, Math.min(width, height) / 2, 0, 2 * Math.PI);
+                ctx.closePath();
+                ctx.clip();
+                
+                ctx.drawImage(canvas, 0, 0);
+                
+                const link = document.createElement('a');
+                link.download = 'cropped-image.png';
+                link.href = circleCanvas.toDataURL('image/png');
+                link.click();
+            } else {
+                const link = document.createElement('a');
+                link.download = 'cropped-image.jpg';
+                link.href = canvas.toDataURL('image/jpeg');
+                link.click();
+            }
+        });
+
+    </script>
+</body>
+</html>
