@@ -1,0 +1,255 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Page Not Found</title>
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap" rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.4);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.6);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+        .mesh-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+        .dark .mesh-gradient {
+            background-color: #020617;
+        }
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+        }
+
+        .dark .blob {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+        }
+    </style>
+</head>
+<body class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-500 min-h-screen flex flex-col font-sans antialiased">
+    <div class="mesh-gradient">
+        <div class="blob animate-blob" style="top: -100px; left: -100px;"></div>
+        <div class="blob animate-blob" style="bottom: -100px; right: -100px; animation-delay: 2s;"></div>
+        <div class="blob animate-blob" style="top: 40%; left: 30%; width: 300px; height: 300px; animation-delay: 4s;">
+        </div>
+    </div>
+
+    <header class="fixed top-0 w-full z-50 glass shadow-sm border-b border-white/20 dark:border-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="/" class="flex items-center space-x-3 group">
+                <div class="relative">
+                    <div
+                        class="absolute -inset-1 bg-gradient-to-r from-brand-600 to-indigo-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200">
+                    </div>
+                    <img src="/favicon.svg" alt="Crop Image Logo"
+                        class="relative w-10 h-10 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+                </div>
+                <span
+                    class="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400">Crop
+                    Image</span>
+            </a>
+            <button id="theme-toggle" aria-label="Toggle dark mode"
+                class="relative group p-3 rounded-2xl bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 shadow-sm border border-white/20 dark:border-white/10">
+                <i data-lucide="sun" class="w-6 h-6 hidden dark:block text-brand-400"></i>
+                <i data-lucide="moon" class="w-6 h-6 block dark:hidden text-brand-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="flex-grow flex flex-col items-center justify-center pt-32 pb-24 px-6 text-center relative z-10">
+        <div class="w-32 h-32 bg-white dark:bg-slate-800 rounded-[2.5rem] flex items-center justify-center mb-10 mx-auto shadow-2xl border border-slate-100 dark:border-slate-700 relative group">
+            <div class="absolute -inset-4 bg-brand-500/20 rounded-full blur-2xl opacity-0 group-hover:opacity-100 transition-opacity duration-500"></div>
+            <i data-lucide="map-pin-off" class="relative w-14 h-14 text-brand-600 dark:text-brand-400"></i>
+        </div>
+        <h1 class="text-5xl md:text-6xl font-black mb-6 tracking-tight">
+            Lost in <span class="bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400">Space?</span>
+        </h1>
+        <p class="text-xl text-slate-600 dark:text-slate-400 max-w-md mx-auto mb-12 leading-relaxed">
+            The page you are looking for doesn't exist or has been moved. Let's get you back to creating.
+        </p>
+        <div class="flex flex-col sm:flex-row gap-5">
+            <a href="/" class="px-10 py-5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white shadow-2xl shadow-brand-500/30 transition-all duration-300 font-bold text-lg flex items-center justify-center space-x-3">
+                <i data-lucide="home" class="w-6 h-6"></i>
+                <span>Back to Home</span>
+            </a>
+            <button onclick="window.history.back()" class="px-10 py-5 rounded-2xl bg-white dark:bg-slate-800 hover:bg-slate-100 dark:hover:bg-slate-700 transition-all font-bold text-lg shadow-sm border border-slate-200 dark:border-slate-700 flex items-center justify-center space-x-3">
+                <i data-lucide="arrow-left" class="w-6 h-6"></i>
+                <span>Go Back</span>
+            </button>
+        </div>
+    </main>
+
+    <footer
+        class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-20 px-6 relative z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
+                <div class="col-span-1 md:col-span-2 space-y-6">
+                    <a href="/" class="flex items-center space-x-3">
+                        <img src="/favicon.svg" alt="Crop Image Logo" class="w-8 h-8">
+                        <span class="text-2xl font-black tracking-tighter text-brand-600 dark:text-brand-400">Crop
+                            Image</span>
+                    </a>
+                    <p class="text-slate-500 dark:text-slate-400 max-w-sm text-lg leading-relaxed">
+                        The ultimate free online tool for professional image cropping. Fast, secure, and built for
+                        modern web standards.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-widest mb-6 text-slate-400">Legal</h4>
+                    <ul class="space-y-4 text-slate-600 dark:text-slate-300 font-medium">
+                        <li><a href="https://pvdspot.com/privacy-policy.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">Privacy Policy</a></li>
+                        <li><a href="https://pvdspot.com/terms-of-use.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-widest mb-6 text-slate-400">Company</h4>
+                    <ul class="space-y-4 text-slate-600 dark:text-slate-300 font-medium">
+                        <li><a href="https://pvdspot.com/about-us.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="pt-10 border-t border-slate-100 dark:border-slate-800 text-center text-sm text-slate-500 font-medium">
+                <p>&copy; <span id="current-year"></span> <a href="/"
+                        class="text-brand-600 dark:text-brand-400 hover:underline">Crop Image</a>. All Rights Reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cookie-banner"
+        class="fixed bottom-8 left-8 right-8 md:left-auto md:right-8 md:w-[26rem] z-[100] glass-card p-8 rounded-3xl shadow-2xl translate-y-32 opacity-0 transition-all duration-700">
+        <div class="flex flex-col space-y-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-brand-100 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center">
+                    <i data-lucide="cookie" class="w-6 h-6 text-brand-600 dark:text-brand-400"></i>
+                </div>
+                <h4 class="font-bold text-lg tracking-tight">Cookie Consent</h4>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                We use cookies to enhance your experience and analyze our traffic. By using our tool, you consent to our
+                use of cookies.
+            </p>
+            <button id="cookie-accept"
+                class="w-full bg-brand-600 hover:bg-brand-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-500/20">Got
+                It</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        const cookieBanner = document.getElementById('cookie-banner');
+        const cookieAccept = document.getElementById('cookie-accept');
+
+        if (!localStorage.getItem('cookie-accepted')) {
+            setTimeout(() => {
+                cookieBanner.classList.remove('translate-y-32', 'opacity-0');
+            }, 1500);
+        }
+
+        cookieAccept.addEventListener('click', () => {
+            cookieBanner.classList.add('translate-y-32', 'opacity-0');
+            localStorage.setItem('cookie-accepted', 'true');
+        });
+    </script>
+</body>
+</html>

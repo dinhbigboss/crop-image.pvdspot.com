@@ -1,0 +1,757 @@
+<!DOCTYPE html>
+<html lang="en" class="scroll-smooth">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Crop Image - Professional Online Image Cropping Tool</title>
+    <meta name="description"
+        content="Free online image cropping tool. Support multiple formats, aspect ratios, and shapes. Fast, secure, and no registration required.">
+    <meta property="og:title" content="Crop Image - Professional Online Image Cropping Tool">
+    <meta property="og:description"
+        content="Crop images online for free. Modern, fast, and secure tool with premium UI.">
+    <meta property="og:image" content="https://crop-image.pvdspot.com/og-image.svg">
+    <meta property="og:url" content="https://crop-image.pvdspot.com/">
+    <meta property="og:type" content="website">
+    <meta name="twitter:card" content="summary_large_image">
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg">
+    <link rel="canonical" href="https://crop-image.pvdspot.com/">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700;800&display=swap"
+        rel="stylesheet">
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.css">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.5.13/cropper.min.js"></script>
+    <script src="https://unpkg.com/lucide@latest"></script>
+    <script>
+        tailwind.config = {
+            darkMode: 'class',
+            theme: {
+                extend: {
+                    fontFamily: {
+                        sans: ['Inter', 'sans-serif'],
+                    },
+                    colors: {
+                        brand: {
+                            50: '#f5f3ff',
+                            100: '#ede9fe',
+                            200: '#ddd6fe',
+                            300: '#c4b5fd',
+                            400: '#a78bfa',
+                            500: '#8b5cf6',
+                            600: '#7c3aed',
+                            700: '#6d28d9',
+                            800: '#5b21b6',
+                            900: '#4c1d95',
+                        }
+                    },
+                    animation: {
+                        'blob': 'blob 7s infinite',
+                        'pulse-slow': 'pulse 4s cubic-bezier(0.4, 0, 0.6, 1) infinite',
+                    },
+                    keyframes: {
+                        blob: {
+                            '0%': { transform: 'translate(0px, 0px) scale(1)' },
+                            '33%': { transform: 'translate(30px, -50px) scale(1.1)' },
+                            '66%': { transform: 'translate(-20px, 20px) scale(0.9)' },
+                            '100%': { transform: 'translate(0px, 0px) scale(1)' },
+                        }
+                    }
+                }
+            }
+        }
+    </script>
+    <style>
+        .glass {
+            background: rgba(255, 255, 255, 0.4);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.3);
+        }
+
+        .dark .glass {
+            background: rgba(15, 23, 42, 0.6);
+            -webkit-backdrop-filter: blur(16px) saturate(180%);
+            backdrop-filter: blur(16px) saturate(180%);
+            border: 1px solid rgba(255, 255, 255, 0.1);
+        }
+
+        .glass-card {
+            background: rgba(255, 255, 255, 0.7);
+            -webkit-backdrop-filter: blur(12px);
+            backdrop-filter: blur(12px);
+            border: 1px solid rgba(255, 255, 255, 0.4);
+            box-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+        }
+
+        .dark .glass-card {
+            background: rgba(30, 41, 59, 0.5);
+            border: 1px solid rgba(255, 255, 255, 0.05);
+            box-shadow: 0 8px 32px 0 rgba(0, 0, 0, 0.3);
+        }
+
+        .cropper-modal {
+            background-color: rgba(0, 0, 0, 0.6) !important;
+            opacity: 0.8 !important;
+        }
+
+        .cropper-view-box {
+            outline: 3px solid #8b5cf6 !important;
+            outline-color: rgba(139, 92, 246, 0.8) !important;
+            box-shadow: 0 0 20px rgba(139, 92, 246, 0.3);
+        }
+
+        .cropper-line {
+            background-color: #8b5cf6 !important;
+            height: 2px !important;
+            width: 2px !important;
+        }
+
+        .cropper-point {
+            background-color: #8b5cf6 !important;
+            width: 12px !important;
+            height: 12px !important;
+            border-radius: 50% !important;
+            opacity: 1 !important;
+        }
+
+        .cropper-point.point-e {
+            right: -6px !important;
+            margin-top: -6px !important;
+        }
+
+        .cropper-point.point-w {
+            left: -6px !important;
+            margin-top: -6px !important;
+        }
+
+        .cropper-point.point-n {
+            top: -6px !important;
+            margin-left: -6px !important;
+        }
+
+        .cropper-point.point-s {
+            bottom: -6px !important;
+            margin-left: -6px !important;
+        }
+
+        .cropper-point.point-ne {
+            right: -6px !important;
+            top: -6px !important;
+        }
+
+        .cropper-point.point-nw {
+            left: -6px !important;
+            top: -6px !important;
+        }
+
+        .cropper-point.point-sw {
+            left: -6px !important;
+            bottom: -6px !important;
+        }
+
+        .cropper-point.point-se {
+            right: -6px !important;
+            bottom: -6px !important;
+            width: 14px !important;
+            height: 14px !important;
+            margin-right: -1px !important;
+            margin-bottom: -1px !important;
+            background-color: #7c3aed !important;
+            box-shadow: 0 0 10px rgba(124, 58, 237, 0.5);
+        }
+
+        .cropper-view-box,
+        .cropper-face {
+            border-radius: inherit;
+        }
+
+        .cropper-container {
+            width: 100% !important;
+            max-height: 65vh !important;
+        }
+
+        .faq-content {
+            max-height: 0;
+            overflow: hidden;
+            transition: max-height 0.4s cubic-bezier(0.4, 0, 0.2, 1);
+        }
+
+        .faq-item.active .faq-content {
+            max-height: 500px;
+        }
+
+        .faq-item.active .faq-icon {
+            transform: rotate(180deg);
+        }
+
+        input[type="file"]::-webkit-file-upload-button {
+            display: none;
+        }
+
+        .mesh-gradient {
+            position: fixed;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            z-index: -1;
+            overflow: hidden;
+            background-color: #f8fafc;
+        }
+
+        .dark .mesh-gradient {
+            background-color: #020617;
+        }
+
+        .blob {
+            position: absolute;
+            width: 500px;
+            height: 500px;
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.15) 0%, rgba(168, 85, 247, 0.15) 100%);
+            filter: blur(80px);
+            border-radius: 50%;
+        }
+
+        .dark .blob {
+            background: linear-gradient(180deg, rgba(99, 102, 241, 0.1) 0%, rgba(168, 85, 247, 0.1) 100%);
+        }
+    </style>
+</head>
+
+<body
+    class="bg-slate-50 dark:bg-slate-950 text-slate-900 dark:text-slate-100 transition-colors duration-500 font-sans antialiased">
+    <div class="mesh-gradient">
+        <div class="blob animate-blob" style="top: -100px; left: -100px;"></div>
+        <div class="blob animate-blob" style="bottom: -100px; right: -100px; animation-delay: 2s;"></div>
+        <div class="blob animate-blob" style="top: 40%; left: 30%; width: 300px; height: 300px; animation-delay: 4s;">
+        </div>
+    </div>
+
+    <header class="fixed top-0 w-full z-50 glass shadow-sm border-b border-white/20 dark:border-white/10">
+        <div class="max-w-7xl mx-auto px-6 h-20 flex items-center justify-between">
+            <a href="/" class="flex items-center space-x-3 group">
+                <div class="relative">
+                    <div
+                        class="absolute -inset-1 bg-gradient-to-r from-brand-600 to-indigo-600 rounded-lg blur opacity-25 group-hover:opacity-50 transition duration-1000 group-hover:duration-200">
+                    </div>
+                    <img src="/favicon.svg" alt="Crop Image Logo"
+                        class="relative w-10 h-10 transition-transform duration-500 group-hover:rotate-12 group-hover:scale-110">
+                </div>
+                <span
+                    class="text-2xl font-extrabold tracking-tight bg-clip-text text-transparent bg-gradient-to-r from-brand-600 to-indigo-600 dark:from-brand-400 dark:to-indigo-400">Crop
+                    Image</span>
+            </a>
+            <button id="theme-toggle" aria-label="Toggle dark mode"
+                class="relative group p-3 rounded-2xl bg-white/50 dark:bg-slate-800/50 hover:bg-white dark:hover:bg-slate-800 transition-all duration-300 shadow-sm border border-white/20 dark:border-white/10">
+                <i data-lucide="sun" class="w-6 h-6 hidden dark:block text-brand-400"></i>
+                <i data-lucide="moon" class="w-6 h-6 block dark:hidden text-brand-600"></i>
+            </button>
+        </div>
+    </header>
+
+    <main class="pt-32 pb-24 px-6 relative z-10">
+        <section class="max-w-4xl mx-auto text-center mb-16">
+            <div
+                class="inline-flex items-center space-x-2 px-4 py-2 rounded-full bg-brand-50 dark:bg-brand-900/20 border border-brand-100 dark:border-brand-800 mb-8 animate-pulse-slow">
+                <span class="relative flex h-2 w-2">
+                    <span
+                        class="animate-ping absolute inline-flex h-full w-full rounded-full bg-brand-400 opacity-75"></span>
+                    <span class="relative inline-flex rounded-full h-2 w-2 bg-brand-500"></span>
+                </span>
+                <span class="text-xs font-bold uppercase tracking-widest text-brand-600 dark:text-brand-400">Free •
+                    Secure • Pro Quality</span>
+            </div>
+            <h1 class="text-5xl md:text-7xl font-black mb-6 tracking-tight">
+                Perfect Crops <br>
+                <span
+                    class="bg-clip-text text-transparent bg-gradient-to-r from-brand-600 via-indigo-600 to-purple-600 dark:from-brand-400 dark:via-indigo-400 dark:to-purple-400">In
+                    Seconds.</span>
+            </h1>
+            <p class="text-xl text-slate-600 dark:text-slate-400 max-w-2xl mx-auto leading-relaxed">
+                Elevate your images with our premium cropping tool. No signup, no watermarks, just pure creative
+                freedom.
+            </p>
+        </section>
+
+        <section id="tool-container"
+            class="max-w-5xl mx-auto glass-card rounded-[2.5rem] p-4 md:p-8 shadow-2xl mb-24 transition-all duration-700 hover:shadow-brand-500/10">
+            <div id="upload-zone"
+                class="border-2 border-dashed border-slate-300 dark:border-slate-700 rounded-[2rem] p-16 md:p-24 text-center cursor-pointer hover:border-brand-500 dark:hover:border-brand-400 hover:bg-brand-50/30 dark:hover:bg-brand-900/10 transition-all duration-500 group relative overflow-hidden">
+                <div
+                    class="absolute inset-0 bg-gradient-to-br from-brand-500/5 to-transparent opacity-0 group-hover:opacity-100 transition-opacity duration-500">
+                </div>
+                <input type="file" id="image-input" accept="image/*" class="hidden" aria-label="Upload image">
+                <label for="image-input" class="cursor-pointer relative z-10">
+                    <div
+                        class="w-24 h-24 bg-white dark:bg-slate-800 rounded-3xl flex items-center justify-center mx-auto mb-8 shadow-xl group-hover:scale-110 group-hover:rotate-3 transition-all duration-500 border border-slate-100 dark:border-slate-700">
+                        <i data-lucide="image-plus" class="w-10 h-10 text-brand-600 dark:text-brand-400"></i>
+                    </div>
+                    <h2 class="text-2xl font-bold mb-3 tracking-tight">Drop your masterpiece here</h2>
+                    <p class="text-slate-500 dark:text-slate-400 text-lg">or click to browse your files</p>
+                    <div class="mt-8 flex justify-center gap-3">
+                        <span
+                            class="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold uppercase tracking-tighter text-slate-500">PNG</span>
+                        <span
+                            class="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold uppercase tracking-tighter text-slate-500">JPG</span>
+                        <span
+                            class="px-3 py-1 rounded-lg bg-slate-100 dark:bg-slate-800 text-[10px] font-bold uppercase tracking-tighter text-slate-500">WEBP</span>
+                    </div>
+                </label>
+            </div>
+
+            <div id="editor-zone" class="hidden space-y-10 animate-in fade-in zoom-in duration-700">
+                <div
+                    class="rounded-3xl overflow-hidden bg-slate-900/5 dark:bg-slate-900/40 min-h-[450px] flex items-center justify-center border border-slate-200 dark:border-slate-800">
+                    <img id="image-preview" src="" alt="Image for cropping" class="max-w-full">
+                </div>
+
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-10">
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center">
+                                <i data-lucide="aspect-ratio" class="w-4 h-4 text-brand-600 dark:text-brand-400"></i>
+                            </div>
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Aspect Ratio</h3>
+                        </div>
+                        <div class="flex flex-wrap gap-3">
+                            <button data-ratio="1"
+                                class="ratio-btn group relative px-6 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition-all active ring-2 ring-brand-500 shadow-sm font-bold text-sm">1:1</button>
+                            <button data-ratio="1.3333333333333333"
+                                class="ratio-btn group relative px-6 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition-all shadow-sm font-bold text-sm">4:3</button>
+                            <button data-ratio="1.7777777777777777"
+                                class="ratio-btn group relative px-6 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition-all shadow-sm font-bold text-sm">16:9</button>
+                            <button data-ratio="0.6666666666666666"
+                                class="ratio-btn group relative px-6 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition-all shadow-sm font-bold text-sm">2:3</button>
+                            <button data-ratio="NaN"
+                                class="ratio-btn group relative px-6 py-3 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition-all shadow-sm font-bold text-sm">Free</button>
+                        </div>
+                    </div>
+
+                    <div class="space-y-6">
+                        <div class="flex items-center space-x-3 mb-2">
+                            <div
+                                class="w-8 h-8 rounded-xl bg-brand-100 dark:bg-brand-900/30 flex items-center justify-center">
+                                <i data-lucide="shapes" class="w-4 h-4 text-brand-600 dark:text-brand-400"></i>
+                            </div>
+                            <h3 class="text-sm font-bold uppercase tracking-widest text-slate-400">Shape Selection</h3>
+                        </div>
+                        <div class="flex gap-4">
+                            <button id="shape-square"
+                                class="shape-btn flex-1 flex items-center justify-center space-x-3 px-6 py-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition-all active ring-2 ring-brand-500 shadow-sm font-bold">
+                                <i data-lucide="square" class="w-5 h-5"></i>
+                                <span>Rectangle</span>
+                            </button>
+                            <button id="shape-circle"
+                                class="shape-btn flex-1 flex items-center justify-center space-x-3 px-6 py-4 rounded-2xl bg-white dark:bg-slate-800 border border-slate-200 dark:border-slate-700 hover:border-brand-500 transition-all shadow-sm font-bold">
+                                <i data-lucide="circle" class="w-5 h-5"></i>
+                                <span>Circular</span>
+                            </button>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="flex flex-col sm:flex-row gap-5 pt-6">
+                    <button id="reset-btn"
+                        class="flex-1 flex items-center justify-center space-x-3 px-8 py-5 rounded-2xl bg-slate-100 dark:bg-slate-800 hover:bg-slate-200 dark:hover:bg-slate-700 transition-all font-bold text-lg shadow-sm">
+                        <i data-lucide="x-circle" class="w-6 h-6"></i>
+                        <span>Cancel</span>
+                    </button>
+                    <button id="download-btn"
+                        class="flex-[2] relative group overflow-hidden flex items-center justify-center space-x-3 px-8 py-5 rounded-2xl bg-brand-600 hover:bg-brand-700 text-white shadow-2xl shadow-brand-500/30 transition-all duration-300 font-bold text-lg">
+                        <div
+                            class="absolute inset-0 bg-gradient-to-r from-transparent via-white/10 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-1000">
+                        </div>
+                        <i data-lucide="download-cloud" class="w-6 h-6"></i>
+                        <span>Export Cropped Image</span>
+                    </button>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-5xl mx-auto mb-32">
+            <h2 class="text-4xl font-black mb-16 text-center tracking-tight">How it works</h2>
+            <div class="grid grid-cols-1 md:grid-cols-3 gap-10">
+                <div
+                    class="glass-card p-10 rounded-[2.5rem] relative group hover:-translate-y-2 transition-transform duration-500">
+                    <div
+                        class="w-16 h-16 bg-brand-500 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-xl shadow-brand-500/20 mb-8 group-hover:rotate-6 transition-transform">
+                        1</div>
+                    <h3 class="text-2xl font-bold mb-4 tracking-tight">Import</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Drag your images into the workspace.
+                        We process everything locally for maximum speed.</p>
+                </div>
+                <div
+                    class="glass-card p-10 rounded-[2.5rem] relative group hover:-translate-y-2 transition-transform duration-500">
+                    <div
+                        class="w-16 h-16 bg-indigo-500 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-xl shadow-indigo-500/20 mb-8 group-hover:rotate-6 transition-transform">
+                        2</div>
+                    <h3 class="text-2xl font-bold mb-4 tracking-tight">Refine</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Use our precision tools to select the
+                        perfect area. Choose from presets or go freehand.</p>
+                </div>
+                <div
+                    class="glass-card p-10 rounded-[2.5rem] relative group hover:-translate-y-2 transition-transform duration-500">
+                    <div
+                        class="w-16 h-16 bg-purple-500 text-white rounded-2xl flex items-center justify-center text-2xl font-black shadow-xl shadow-purple-500/20 mb-8 group-hover:rotate-6 transition-transform">
+                        3</div>
+                    <h3 class="text-2xl font-bold mb-4 tracking-tight">Success</h3>
+                    <p class="text-slate-600 dark:text-slate-400 leading-relaxed">Export your result in high resolution.
+                        Your data never leaves your device.</p>
+                </div>
+            </div>
+        </section>
+
+        <section class="max-w-3xl mx-auto mb-32">
+            <div class="text-center mb-16">
+                <h2 class="text-4xl font-black mb-4 tracking-tight">Common Questions</h2>
+                <p class="text-slate-500 dark:text-slate-400">Everything you need to know about our tool</p>
+            </div>
+            <div class="space-y-6">
+                <div class="faq-item glass-card rounded-[2rem] overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-trigger w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none group"
+                        aria-label="Toggle FAQ">
+                        <span class="text-lg font-bold tracking-tight group-hover:text-brand-500 transition-colors">Is
+                            this tool completely free?</span>
+                        <div
+                            class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-all">
+                            <i data-lucide="chevron-down"
+                                class="faq-icon w-5 h-5 transition-transform duration-500"></i>
+                        </div>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-8 pb-8 text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Yes, our image cropping tool is 100% free with no hidden costs, no subscription required,
+                            and no watermarks on your output images.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item glass-card rounded-[2rem] overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-trigger w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none group"
+                        aria-label="Toggle FAQ">
+                        <span class="text-lg font-bold tracking-tight group-hover:text-brand-500 transition-colors">Is
+                            my data secure?</span>
+                        <div
+                            class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-all">
+                            <i data-lucide="chevron-down"
+                                class="faq-icon w-5 h-5 transition-transform duration-500"></i>
+                        </div>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-8 pb-8 text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Absolutely. All image processing happens directly in your browser. Your images are never
+                            uploaded to our servers, ensuring maximum privacy and security.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item glass-card rounded-[2rem] overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-trigger w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none group"
+                        aria-label="Toggle FAQ">
+                        <span class="text-lg font-bold tracking-tight group-hover:text-brand-500 transition-colors">What
+                            image formats are supported?</span>
+                        <div
+                            class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-all">
+                            <i data-lucide="chevron-down"
+                                class="faq-icon w-5 h-5 transition-transform duration-500"></i>
+                        </div>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-8 pb-8 text-slate-600 dark:text-slate-400 leading-relaxed">
+                            We support all popular image formats including JPG, PNG, WEBP, GIF (static), and BMP. The
+                            output format will match your source or default to high-quality PNG.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item glass-card rounded-[2rem] overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-trigger w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none group"
+                        aria-label="Toggle FAQ">
+                        <span class="text-lg font-bold tracking-tight group-hover:text-brand-500 transition-colors">Can
+                            I crop images into circles?</span>
+                        <div
+                            class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-all">
+                            <i data-lucide="chevron-down"
+                                class="faq-icon w-5 h-5 transition-transform duration-500"></i>
+                        </div>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-8 pb-8 text-slate-600 dark:text-slate-400 leading-relaxed">
+                            Yes! Our tool provides a dedicated "Circular" mode that helps you crop images into a perfect
+                            circle, ideal for profile pictures and avatars.
+                        </div>
+                    </div>
+                </div>
+                <div class="faq-item glass-card rounded-[2rem] overflow-hidden transition-all duration-300">
+                    <button
+                        class="faq-trigger w-full px-8 py-6 flex items-center justify-between text-left focus:outline-none group"
+                        aria-label="Toggle FAQ">
+                        <span class="text-lg font-bold tracking-tight group-hover:text-brand-500 transition-colors">Do I
+                            need to sign up to use it?</span>
+                        <div
+                            class="w-10 h-10 rounded-xl bg-slate-100 dark:bg-slate-800 flex items-center justify-center group-hover:bg-brand-500 group-hover:text-white transition-all">
+                            <i data-lucide="chevron-down"
+                                class="faq-icon w-5 h-5 transition-transform duration-500"></i>
+                        </div>
+                    </button>
+                    <div class="faq-content">
+                        <div class="px-8 pb-8 text-slate-600 dark:text-slate-400 leading-relaxed">
+                            No registration or account creation is needed. You can start cropping your images
+                            immediately without providing any personal information.
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </section>
+    </main>
+
+    <footer
+        class="bg-white/80 dark:bg-slate-900/80 backdrop-blur-md border-t border-slate-200 dark:border-slate-800 py-20 px-6 relative z-10">
+        <div class="max-w-7xl mx-auto">
+            <div class="grid grid-cols-1 md:grid-cols-4 gap-16 mb-16">
+                <div class="col-span-1 md:col-span-2 space-y-6">
+                    <a href="/" class="flex items-center space-x-3">
+                        <img src="/favicon.svg" alt="Crop Image Logo" class="w-8 h-8">
+                        <span class="text-2xl font-black tracking-tighter text-brand-600 dark:text-brand-400">Crop
+                            Image</span>
+                    </a>
+                    <p class="text-slate-500 dark:text-slate-400 max-w-sm text-lg leading-relaxed">
+                        The ultimate free online tool for professional image cropping. Fast, secure, and built for
+                        modern web standards.
+                    </p>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-widest mb-6 text-slate-400">Legal</h4>
+                    <ul class="space-y-4 text-slate-600 dark:text-slate-300 font-medium">
+                        <li><a href="https://pvdspot.com/privacy-policy.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">Privacy Policy</a></li>
+                        <li><a href="https://pvdspot.com/terms-of-use.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">Terms of Use</a></li>
+                    </ul>
+                </div>
+                <div>
+                    <h4 class="font-black text-sm uppercase tracking-widest mb-6 text-slate-400">Company</h4>
+                    <ul class="space-y-4 text-slate-600 dark:text-slate-300 font-medium">
+                        <li><a href="https://pvdspot.com/about-us.html" target="_blank" rel="noopener noreferrer"
+                                class="hover:text-brand-500 transition-colors">About Us</a></li>
+                    </ul>
+                </div>
+            </div>
+            <div
+                class="pt-10 border-t border-slate-100 dark:border-slate-800 text-center text-sm text-slate-500 font-medium">
+                <p>&copy; <span id="current-year"></span> <a href="/"
+                        class="text-brand-600 dark:text-brand-400 hover:underline">Crop Image</a>. All Rights Reserved.
+                </p>
+            </div>
+        </div>
+    </footer>
+
+    <div id="cookie-banner"
+        class="fixed bottom-8 left-8 right-8 md:left-auto md:right-8 md:w-[26rem] z-[100] glass-card p-8 rounded-3xl shadow-2xl translate-y-32 opacity-0 transition-all duration-700">
+        <div class="flex flex-col space-y-6">
+            <div class="flex items-center space-x-4">
+                <div class="w-12 h-12 bg-brand-100 dark:bg-brand-900/30 rounded-2xl flex items-center justify-center">
+                    <i data-lucide="cookie" class="w-6 h-6 text-brand-600 dark:text-brand-400"></i>
+                </div>
+                <h4 class="font-bold text-lg tracking-tight">Cookie Consent</h4>
+            </div>
+            <p class="text-slate-600 dark:text-slate-400 leading-relaxed">
+                We use cookies to enhance your experience and analyze our traffic. By using our tool, you consent to our
+                use of cookies.
+            </p>
+            <button id="cookie-accept"
+                class="w-full bg-brand-600 hover:bg-brand-700 text-white px-8 py-4 rounded-2xl font-bold transition-all shadow-lg shadow-brand-500/20">Got
+                It</button>
+        </div>
+    </div>
+
+    <script>
+        lucide.createIcons();
+
+        const themeToggle = document.getElementById('theme-toggle');
+        const html = document.documentElement;
+
+        if (localStorage.theme === 'dark' || (!('theme' in localStorage) && window.matchMedia('(prefers-color-scheme: dark)').matches)) {
+            html.classList.add('dark');
+        } else {
+            html.classList.remove('dark');
+        }
+
+        themeToggle.addEventListener('click', () => {
+            if (html.classList.contains('dark')) {
+                html.classList.remove('dark');
+                localStorage.theme = 'light';
+            } else {
+                html.classList.add('dark');
+                localStorage.theme = 'dark';
+            }
+        });
+
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+
+        const cookieBanner = document.getElementById('cookie-banner');
+        const cookieAccept = document.getElementById('cookie-accept');
+
+        if (!localStorage.getItem('cookie-accepted')) {
+            setTimeout(() => {
+                cookieBanner.classList.remove('translate-y-32', 'opacity-0');
+            }, 1500);
+        }
+
+        cookieAccept.addEventListener('click', () => {
+            cookieBanner.classList.add('translate-y-32', 'opacity-0');
+            localStorage.setItem('cookie-accepted', 'true');
+        });
+
+        const faqTriggers = document.querySelectorAll('.faq-trigger');
+        faqTriggers.forEach(trigger => {
+            trigger.addEventListener('click', () => {
+                const item = trigger.closest('.faq-item');
+                const isActive = item.classList.contains('active');
+
+                document.querySelectorAll('.faq-item').forEach(i => i.classList.remove('active'));
+
+                if (!isActive) {
+                    item.classList.add('active');
+                }
+            });
+        });
+
+        let cropper = null;
+        const imageInput = document.getElementById('image-input');
+        const uploadZone = document.getElementById('upload-zone');
+        const editorZone = document.getElementById('editor-zone');
+        const imagePreview = document.getElementById('image-preview');
+        const ratioBtns = document.querySelectorAll('.ratio-btn');
+        const shapeBtns = document.querySelectorAll('.shape-btn');
+        const resetBtn = document.getElementById('reset-btn');
+        const downloadBtn = document.getElementById('download-btn');
+
+        uploadZone.addEventListener('dragover', (e) => {
+            e.preventDefault();
+            uploadZone.classList.add('border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-900/10', 'scale-[0.98]');
+        });
+
+        uploadZone.addEventListener('dragleave', () => {
+            uploadZone.classList.remove('border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-900/10', 'scale-[0.98]');
+        });
+
+        uploadZone.addEventListener('drop', (e) => {
+            e.preventDefault();
+            uploadZone.classList.remove('border-brand-500', 'bg-brand-50/50', 'dark:bg-brand-900/10', 'scale-[0.98]');
+            const file = e.dataTransfer.files[0];
+            if (file && file.type.startsWith('image/')) {
+                handleImage(file);
+            }
+        });
+
+        imageInput.addEventListener('change', (e) => {
+            const file = e.target.files[0];
+            if (file) handleImage(file);
+        });
+
+        function handleImage(file) {
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                imagePreview.src = e.target.result;
+                uploadZone.classList.add('hidden');
+                editorZone.classList.remove('hidden');
+                initCropper();
+            };
+            reader.readAsDataURL(file);
+        }
+
+        function initCropper() {
+            if (cropper) cropper.destroy();
+            cropper = new Cropper(imagePreview, {
+                aspectRatio: 1,
+                viewMode: 1,
+                dragMode: 'move',
+                autoCropArea: 0.8,
+                responsive: true,
+                background: false,
+                ready() {
+                    this.cropper.crop();
+                }
+            });
+        }
+
+        ratioBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                const ratio = parseFloat(btn.dataset.ratio);
+                cropper.setAspectRatio(ratio);
+                ratioBtns.forEach(b => b.classList.remove('active', 'ring-2', 'ring-brand-500'));
+                btn.classList.add('active', 'ring-2', 'ring-brand-500');
+            });
+        });
+
+        shapeBtns.forEach(btn => {
+            btn.addEventListener('click', () => {
+                shapeBtns.forEach(b => b.classList.remove('active', 'ring-2', 'ring-brand-500'));
+                btn.classList.add('active', 'ring-2', 'ring-brand-500');
+
+                const isCircle = btn.id === 'shape-circle';
+                const cropperContainer = document.querySelector('.cropper-view-box');
+                const cropperFace = document.querySelector('.cropper-face');
+
+                if (isCircle) {
+                    cropperContainer.style.borderRadius = '50%';
+                    cropperFace.style.borderRadius = '50%';
+                } else {
+                    cropperContainer.style.borderRadius = '0';
+                    cropperFace.style.borderRadius = '0';
+                }
+            });
+        });
+
+        resetBtn.addEventListener('click', () => {
+            editorZone.classList.add('hidden');
+            uploadZone.classList.remove('hidden');
+            imageInput.value = '';
+            if (cropper) cropper.destroy();
+        });
+
+        downloadBtn.addEventListener('click', () => {
+            const isCircle = document.getElementById('shape-circle').classList.contains('active');
+            const canvas = cropper.getCroppedCanvas({
+                imageSmoothingEnabled: true,
+                imageSmoothingQuality: 'high',
+            });
+
+            if (isCircle) {
+                const ellipseCanvas = document.createElement('canvas');
+                const context = ellipseCanvas.getContext('2d');
+                const width = canvas.width;
+                const height = canvas.height;
+
+                ellipseCanvas.width = width;
+                ellipseCanvas.height = height;
+
+                context.imageSmoothingEnabled = true;
+                context.imageSmoothingQuality = 'high';
+
+                context.beginPath();
+                context.ellipse(width / 2, height / 2, width / 2, height / 2, 0, 0, 2 * Math.PI);
+                context.clip();
+                context.drawImage(canvas, 0, 0);
+
+                download(ellipseCanvas.toDataURL('image/png', 1.0));
+            } else {
+                download(canvas.toDataURL('image/png', 1.0));
+            }
+        });
+
+        function download(dataUrl) {
+            const link = document.createElement('a');
+            link.download = `crop-image-${Date.now()}.png`;
+            link.href = dataUrl;
+            link.click();
+        }
+    </script>
+</body>
+
+</html>
